@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: enterprise-service
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      transactionService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+  datasource:
+    url: jdbc:h2:mem:devdb;MODE=MSSQLServer
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true # This lets you see the DB at localhost:8080/h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
