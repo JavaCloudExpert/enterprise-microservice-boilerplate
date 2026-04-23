@@ -39,4 +39,5 @@ jobs:
             -Dsonar.organization=${SONAR_ORGANIZATION} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.newCode.referenceBranch=main \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
             -Dsonar.qualitygate.wait=true
