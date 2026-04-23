@@ -3,6 +3,8 @@ package com.javacloudexpert.enterpriseservice.infrastructure.persistence;
 import com.javacloudexpert.enterpriseservice.domain.Transaction;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class TransactionMapper {
 
@@ -12,9 +14,17 @@ public class TransactionMapper {
         jpa.setAmount(domain.getAmount());
         jpa.setCurrency(domain.getCurrency());
         jpa.setStatus(domain.getStatus());
-        jpa.setCreatedAt(java.time.LocalDateTime.now());
+        jpa.setCreatedAt(LocalDateTime.now());
         return jpa;
     }
-    
-    // Add toDomain() method here later for reading from DB
+
+    public Transaction toDomain(TransactionJpaEntity jpa) {
+        return Transaction.reconstitute(
+                jpa.getId(),
+                jpa.getAmount(),
+                jpa.getCurrency(),
+                jpa.getStatus(),
+                jpa.getCreatedAt()
+        );
+    }
 }
