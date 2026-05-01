@@ -51,4 +51,37 @@ class TransactionTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Only PENDING transactions can be completed");
     }
+
+    @Test
+    @DisplayName("Should transition from PENDING to FAILED")
+    void shouldFailPendingTransaction() {
+        Transaction transaction = new Transaction(new BigDecimal("75.00"), "EUR");
+
+        transaction.fail();
+
+        assertThat(transaction.getStatus()).isEqualTo(TransactionStatus.FAILED);
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalStateException when failing a non-pending transaction")
+    void shouldFailToFailIfAlreadyCompleted() {
+        Transaction transaction = new Transaction(new BigDecimal("75.00"), "EUR");
+        transaction.complete();
+
+        assertThatThrownBy(transaction::fail)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Only PENDING transactions can be failed");
+    }
+
+    @Test
+    @DisplayName("Should reconstitute a Transaction from persistence without validation")
+    void shouldReconstituteFromPersistence() {
+        java.util.UUID id = java.util.UUID.randomUUID();
+        Transaction transaction = Transaction.reconstitute(
+                id, new BigDecimal("200.00"), "GBP", TransactionStatus.COMPLETED,
+                java.time.LocalDateTime.now());
+
+        assertThat(transaction.getId()).isEqualTo(id);
+        assertThat(transaction.getStatus()).isEqualTo(TransactionStatus.COMPLETED);
+    }
 }

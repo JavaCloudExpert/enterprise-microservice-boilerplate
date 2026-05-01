@@ -24,6 +24,20 @@ public class Transaction {
         this.status = TransactionStatus.PENDING;
     }
 
+    // Package-private factory method for reconstituting from persistence (bypasses creation rules)
+    private Transaction(UUID id, BigDecimal amount, String currency, TransactionStatus status, LocalDateTime createdAt) {
+        this.id = id;
+        this.amount = amount;
+        this.currency = currency;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
+    public static Transaction reconstitute(UUID id, BigDecimal amount, String currency,
+                                           TransactionStatus status, LocalDateTime createdAt) {
+        return new Transaction(id, amount, currency, status, createdAt);
+    }
+
     public void complete() {
         if (this.status != TransactionStatus.PENDING) {
             throw new IllegalStateException("Only PENDING transactions can be completed.");
@@ -31,8 +45,10 @@ public class Transaction {
         this.status = TransactionStatus.COMPLETED;
     }
 
-    @SuppressWarnings("unused") // This method is intentionally left for future use (e.g., in a retry mechanism)
     public void fail() {
+        if (this.status != TransactionStatus.PENDING) {
+            throw new IllegalStateException("Only PENDING transactions can be failed.");
+        }
         this.status = TransactionStatus.FAILED;
     }
 }
