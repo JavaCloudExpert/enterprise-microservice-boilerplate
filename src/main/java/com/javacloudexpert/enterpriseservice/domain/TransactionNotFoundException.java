@@ -8,4 +8,3 @@ public class TransactionNotFoundException extends RuntimeException {
         super("Transaction not found with id: " + id);
     }
 }
-

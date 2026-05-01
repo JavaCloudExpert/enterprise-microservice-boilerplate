@@ -1,9 +1,10 @@
 package com.javacloudexpert.enterpriseservice.domain;
 
-import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import lombok.Getter;
 
 @Getter // Resolves all "Field may have Lombok @Getter" warnings
 public class Transaction {
@@ -25,7 +26,12 @@ public class Transaction {
     }
 
     // Package-private factory method for reconstituting from persistence (bypasses creation rules)
-    private Transaction(UUID id, BigDecimal amount, String currency, TransactionStatus status, LocalDateTime createdAt) {
+    private Transaction(
+            UUID id,
+            BigDecimal amount,
+            String currency,
+            TransactionStatus status,
+            LocalDateTime createdAt) {
         this.id = id;
         this.amount = amount;
         this.currency = currency;
@@ -33,8 +39,12 @@ public class Transaction {
         this.createdAt = createdAt;
     }
 
-    public static Transaction reconstitute(UUID id, BigDecimal amount, String currency,
-                                           TransactionStatus status, LocalDateTime createdAt) {
+    public static Transaction reconstitute(
+            UUID id,
+            BigDecimal amount,
+            String currency,
+            TransactionStatus status,
+            LocalDateTime createdAt) {
         return new Transaction(id, amount, currency, status, createdAt);
     }
 

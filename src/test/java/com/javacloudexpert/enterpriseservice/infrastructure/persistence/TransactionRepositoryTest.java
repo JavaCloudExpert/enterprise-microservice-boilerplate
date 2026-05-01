@@ -1,25 +1,25 @@
 package com.javacloudexpert.enterpriseservice.infrastructure.persistence;
 
-import com.javacloudexpert.enterpriseservice.domain.TransactionStatus;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+
+import com.javacloudexpert.enterpriseservice.domain.TransactionStatus;
 
 @DataJpaTest
 @ActiveProfiles("test") // This triggers our H2 MSSQL-mode configuration
 class TransactionRepositoryIntegrationTest {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
+    @Autowired private TransactionRepository transactionRepository;
 
     @Test
     @DisplayName("Should persist and retrieve a Transaction entity")

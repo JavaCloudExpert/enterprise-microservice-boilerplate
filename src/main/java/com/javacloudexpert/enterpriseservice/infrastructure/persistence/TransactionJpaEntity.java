@@ -1,15 +1,18 @@
 package com.javacloudexpert.enterpriseservice.infrastructure.persistence;
 
-import com.javacloudexpert.enterpriseservice.domain.TransactionStatus;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import jakarta.persistence.*;
+
+import org.hibernate.annotations.JdbcTypeCode;
+
+import com.javacloudexpert.enterpriseservice.domain.TransactionStatus;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "transactions") // For MS SQL/DB2 compatibility
@@ -21,7 +24,6 @@ public class TransactionJpaEntity {
     @Id
     @JdbcTypeCode(java.sql.Types.VARCHAR) // Tells Hibernate to use a standard UUID format
     private UUID id;
-
 
     @Column(nullable = false, precision = 19, scale = 4) // Enterprise standard for Currency
     private BigDecimal amount;
@@ -37,6 +39,5 @@ public class TransactionJpaEntity {
     private LocalDateTime createdAt;
 
     // Expert Touch: Optimistic Locking for high-concurrency enterprise apps
-    @Version
-    private Long version;
+    @Version private Long version;
 }
