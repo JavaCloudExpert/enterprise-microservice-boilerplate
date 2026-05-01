@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
 @Slf4j
+@SuppressWarnings("unused")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(TransactionNotFoundException.class)
@@ -54,7 +55,7 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleIllegalState(IllegalStateException ex) {
         log.warn("Illegal state: {}", ex.getMessage());
         ProblemDetail problem =
-                ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+                ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
         problem.setTitle("Unprocessable Entity");
         problem.setType(
                 URI.create("https://api.javacloudexpert.com/errors/invalid-state-transition"));

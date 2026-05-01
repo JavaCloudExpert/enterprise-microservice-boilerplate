@@ -31,6 +31,11 @@
         <spring-cloud.version>2025.1.1</spring-cloud.version>
         <spotless.version>2.43.0</spotless.version>
         <google-java-format.version>1.19.2</google-java-format.version>
+        <!--
+            CVE fix: Pin Apache Tomcat to 11.0.21 via Spring Boot BOM property.
+            Fixes: CVE-2026-34487 (HIGH), CVE-2026-34483 (HIGH), CVE-2026-34500 (MEDIUM)
+        -->
+        <tomcat.version>11.0.21</tomcat.version>
     </properties>
     <dependencies>
         <dependency>
@@ -87,12 +92,34 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
+            <!--
+                CVE fix: Import tools.jackson:jackson-bom 3.1.2 BEFORE spring-cloud-dependencies
+                so this BOM takes precedence over the 3.1.0 version imported by spring-boot-dependencies.
+                Fixes: GHSA-2m67-wjpj-xhg9 (HIGH) in tools.jackson.core:jackson-core
+            -->
+            <dependency>
+                <groupId>tools.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>3.1.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!--
+                CVE fix: Pin BouncyCastle to 1.84 (transitive via spring-cloud-commons).
+                Not managed by Spring Boot BOM; explicit override required.
+                Fixes: CVE-2026-0636 (MEDIUM), CVE-2026-5598 (HIGH)
+            -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.84</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
