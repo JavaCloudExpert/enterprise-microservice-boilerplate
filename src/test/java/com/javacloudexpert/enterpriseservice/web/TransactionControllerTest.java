@@ -105,7 +105,7 @@ class TransactionControllerTest {
         when(service.findById(any())).thenThrow(new IllegalStateException("invalid state transition"));
 
         mockMvc.perform(get("/api/v1/transactions/{id}", UUID.randomUUID()))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().is(422))
                 .andExpect(jsonPath("$.title").value("Unprocessable Entity"))
                 .andExpect(jsonPath("$.detail").value("invalid state transition"));
     }
