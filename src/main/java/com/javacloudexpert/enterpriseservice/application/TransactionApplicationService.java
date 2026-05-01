@@ -1,17 +1,19 @@
 package com.javacloudexpert.enterpriseservice.application;
 
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.javacloudexpert.enterpriseservice.application.dto.ProcessTransactionCommand;
 import com.javacloudexpert.enterpriseservice.domain.Transaction;
 import com.javacloudexpert.enterpriseservice.domain.TransactionNotFoundException;
 import com.javacloudexpert.enterpriseservice.infrastructure.persistence.TransactionMapper;
 import com.javacloudexpert.enterpriseservice.infrastructure.persistence.TransactionRepository;
+
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -34,13 +36,14 @@ public class TransactionApplicationService {
 
         // 3. Persist via Infrastructure
         repository.save(mapper.toJpaEntity(transaction));
-        
+
         log.info("Transaction {} processed successfully", transaction.getId());
     }
 
     @Transactional(readOnly = true)
     public Transaction findById(UUID id) {
-        return repository.findById(id)
+        return repository
+                .findById(id)
                 .map(mapper::toDomain)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
     }

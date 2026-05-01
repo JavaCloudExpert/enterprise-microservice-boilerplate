@@ -1,9 +1,10 @@
 package com.javacloudexpert.enterpriseservice.infrastructure.persistence;
 
-import com.javacloudexpert.enterpriseservice.domain.Transaction;
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import com.javacloudexpert.enterpriseservice.domain.Transaction;
 
 @Component
 public class TransactionMapper {
@@ -24,7 +25,6 @@ public class TransactionMapper {
                 jpa.getAmount(),
                 jpa.getCurrency(),
                 jpa.getStatus(),
-                jpa.getCreatedAt()
-        );
+                jpa.getCreatedAt());
     }
 }

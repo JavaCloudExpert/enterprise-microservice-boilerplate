@@ -1,15 +1,16 @@
 package com.javacloudexpert.enterpriseservice.infrastructure.persistence;
 
-import com.javacloudexpert.enterpriseservice.domain.Transaction;
-import com.javacloudexpert.enterpriseservice.domain.TransactionStatus;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.javacloudexpert.enterpriseservice.domain.Transaction;
+import com.javacloudexpert.enterpriseservice.domain.TransactionStatus;
 
 class TransactionMapperTest {
 
@@ -18,13 +19,13 @@ class TransactionMapperTest {
     @Test
     @DisplayName("toJpaEntity - should map domain Transaction to JPA entity correctly")
     void shouldMapDomainToJpaEntity() {
-        Transaction domain = Transaction.reconstitute(
-                UUID.randomUUID(),
-                new BigDecimal("150.00"),
-                "GBP",
-                TransactionStatus.PENDING,
-                LocalDateTime.now()
-        );
+        Transaction domain =
+                Transaction.reconstitute(
+                        UUID.randomUUID(),
+                        new BigDecimal("150.00"),
+                        "GBP",
+                        TransactionStatus.PENDING,
+                        LocalDateTime.now());
 
         TransactionJpaEntity jpa = mapper.toJpaEntity(domain);
 
@@ -63,8 +64,9 @@ class TransactionMapperTest {
         UUID id = UUID.randomUUID();
         LocalDateTime createdAt = LocalDateTime.now();
 
-        Transaction original = Transaction.reconstitute(id, new BigDecimal("99.99"), "USD",
-                TransactionStatus.FAILED, createdAt);
+        Transaction original =
+                Transaction.reconstitute(
+                        id, new BigDecimal("99.99"), "USD", TransactionStatus.FAILED, createdAt);
 
         Transaction roundTripped = mapper.toDomain(mapper.toJpaEntity(original));
 
@@ -74,4 +76,3 @@ class TransactionMapperTest {
         assertThat(roundTripped.getStatus()).isEqualTo(original.getStatus());
     }
 }
-

@@ -1,12 +1,12 @@
 package com.javacloudexpert.enterpriseservice.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class TransactionTest {
 
@@ -77,9 +77,13 @@ class TransactionTest {
     @DisplayName("Should reconstitute a Transaction from persistence without validation")
     void shouldReconstituteFromPersistence() {
         java.util.UUID id = java.util.UUID.randomUUID();
-        Transaction transaction = Transaction.reconstitute(
-                id, new BigDecimal("200.00"), "GBP", TransactionStatus.COMPLETED,
-                java.time.LocalDateTime.now());
+        Transaction transaction =
+                Transaction.reconstitute(
+                        id,
+                        new BigDecimal("200.00"),
+                        "GBP",
+                        TransactionStatus.COMPLETED,
+                        java.time.LocalDateTime.now());
 
         assertThat(transaction.getId()).isEqualTo(id);
         assertThat(transaction.getStatus()).isEqualTo(TransactionStatus.COMPLETED);
