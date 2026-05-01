@@ -85,6 +85,42 @@ class TransactionControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value("Transaction Not Found"));
     }
+
+    // --- GlobalExceptionHandler coverage: lines 39+ ---
+
+    @Test
+    @DisplayName("GlobalExceptionHandler - should return 400 for IllegalArgumentException")
+    void shouldReturn400ForIllegalArgument() throws Exception {
+        when(service.findById(any())).thenThrow(new IllegalArgumentException("invalid argument"));
+
+        mockMvc.perform(get("/api/v1/transactions/{id}", UUID.randomUUID()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Bad Request"))
+                .andExpect(jsonPath("$.detail").value("invalid argument"));
+    }
+
+    @Test
+    @DisplayName("GlobalExceptionHandler - should return 422 for IllegalStateException")
+    void shouldReturn422ForIllegalState() throws Exception {
+        when(service.findById(any())).thenThrow(new IllegalStateException("invalid state transition"));
+
+        mockMvc.perform(get("/api/v1/transactions/{id}", UUID.randomUUID()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.title").value("Unprocessable Entity"))
+                .andExpect(jsonPath("$.detail").value("invalid state transition"));
+    }
+
+    @Test
+    @DisplayName("GlobalExceptionHandler - should return 503 for unexpected RuntimeException")
+    void shouldReturn503ForRuntimeException() throws Exception {
+        doThrow(new RuntimeException("unexpected failure")).when(service).execute(any());
+
+        mockMvc.perform(post("/api/v1/transactions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"amount\":100.00,\"currency\":\"USD\"}"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.title").value("Service Unavailable"));
+    }
 }
 
 
