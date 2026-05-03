@@ -31,6 +31,7 @@
         <spring-cloud.version>2025.1.1</spring-cloud.version>
         <spotless.version>2.43.0</spotless.version>
         <google-java-format.version>1.19.2</google-java-format.version>
+        <dependency-check.version>11.1.1</dependency-check.version>
         <!--
             CVE fix: Pin Apache Tomcat to 11.0.21 via Spring Boot BOM property.
             Fixes: CVE-2026-34487 (HIGH), CVE-2026-34483 (HIGH), CVE-2026-34500 (MEDIUM)
@@ -141,7 +142,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.13</version>
                 <executions>
                     <execution>
                         <goals>
@@ -184,6 +185,29 @@
                         <phase>verify</phase>
                     </execution>
                 </executions>
+            </plugin>
+            <!--
+                OWASP Dependency-Check: scans all dependencies for known CVEs.
+                NOT bound to the build lifecycle — runs ONLY when explicitly invoked:
+                  ./mvnw dependency-check:check
+                In CI the pipeline calls it as a dedicated step (see .github/workflows/pipeline.yaml).
+                Report output: target/dependency-check-report.html / .json / .xml
+                Pass NVD API key via: -DnvdApiKey=<your-key>  (or set NVD_API_KEY env var)
+                Register a free key at: https://nvd.nist.gov/developers/request-an-api-key
+                failBuildOnCVSS: 11 = report only; lower to 7 to fail on HIGH CVEs.
+            -->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${dependency-check.version}</version>
+                <configuration>
+                    <nvdApiKey>${nvdApiKey}</nvdApiKey> <!-- passed via -DnvdApiKey=... -->
+                    <failBuildOnCVSS>11</failBuildOnCVSS> <!-- 11 = never fail; lower to e.g. 7 to fail on HIGH -->
+                    <format>ALL</format>                   <!-- generates HTML, JSON, XML reports -->
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <suppressionFile>${project.basedir}/dependency-check-suppressions.xml</suppressionFile>
+                </configuration>
+                <!-- No <executions> block: plugin does NOT run during mvn verify -->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
