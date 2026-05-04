@@ -14,6 +14,7 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_ORGANIZATION: javacloudexpert
       SONAR_PROJECT_KEY: JavaCloudExpert_enterprise-microservice-boilerplate2  # displays as "enterprise-service" in SonarCloud
+      NVD_API_KEY: ${{ secrets.NVD_API_KEY }}  # Register free: https://nvd.nist.gov/developers/request-an-api-key → add as GitHub secret NVD_API_KEY
 
     steps:
       - name: Checkout Code
@@ -45,6 +46,8 @@ jobs:
       # ─────────────────────────────────────────────────────────────────────────
 
       - name: Cache NVD Database
+        # Only cache when we have an API key — no point caching a slow unauthenticated download.
+        if: ${{ env.NVD_API_KEY != '' }}
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository/org/owasp/dependency-check-data
@@ -55,17 +58,26 @@ jobs:
             nvd-db-${{ runner.os }}-
 
       - name: Vulnerability Scan (OWASP Dependency-Check)
-        # Always runs — even if Build step fails — so a report is always produced.
-        # continue-on-error: true  →  pipeline never blocks on CVEs (remove to enforce threshold).
+        # Skipped when NVD_API_KEY secret is not set — avoids the very slow unauthenticated download.
+        # To enable: add NVD_API_KEY as a GitHub repository secret.
+        # Register free at: https://nvd.nist.gov/developers/request-an-api-key
         # failBuildOnCVSS is controlled in pom.xml (currently 11 = report only).
-        if: always()
-        continue-on-error: true
+        if: ${{ always() && env.NVD_API_KEY != '' }}
+        continue-on-error: true   # remove to make HIGH CVEs block the pipeline
         run: |
           ./mvnw dependency-check:check \
-            -DnvdApiKey=${{ secrets.NVD_API_KEY }}
+            -DnvdApiKey=${{ env.NVD_API_KEY }}
+
+      - name: Vulnerability Scan Skipped Notice
+        # Informs the developer why the scan was skipped instead of silently hanging.
+        if: ${{ env.NVD_API_KEY == '' }}
+        run: |
+          echo "##[warning]Vulnerability scan SKIPPED — NVD_API_KEY secret is not set."
+          echo "          Register a free key at: https://nvd.nist.gov/developers/request-an-api-key"
+          echo "          Then add it as a GitHub repository secret named NVD_API_KEY."
 
       - name: Upload Vulnerability Report
-        if: always()
+        if: ${{ always() && env.NVD_API_KEY != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
